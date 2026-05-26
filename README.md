@@ -238,6 +238,7 @@ generated/               # DNS/SNMP 等の生成設定（自動）
 | DHCP がホストで起動しない | Windows で 67 は制限されがち。`publish_ports: false` で内部のみ利用 |
 | 設定変更が反映されない | `.\scripts\lab.ps1 restart` で compose 再生成 |
 | Python がない | `py -3` または python.org からインストール |
+| `lab.ps1 up` で「Python」だけ表示 | Store 用スタブ。アプリ実行エイリアスをオフし本物の Python を入れる（[認証トラブルシュート](docs/GitHub認証トラブルシュート.md) 参照） |
 
 ## ライセンス
 
