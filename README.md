@@ -30,8 +30,8 @@ Windows など任意の端末で、**LAN 上の複数セグメント + インフ
 リモートに push 済みの場合、各 PC では clone / pull だけで揃えられます。
 
 ```powershell
-git clone https://github.com/<組織またはユーザー>/network-lab.git
-cd network-lab
+git clone https://github.com/okuson20-dev/testenv.git
+cd testenv
 copy config\lab.json.example config\lab.json
 .\scripts\lab.ps1 up
 ```
@@ -43,7 +43,7 @@ git pull
 .\scripts\lab.ps1 restart
 ```
 
-リポジトリの初回登録（管理者向け）は [docs/起動手順書.md](docs/起動手順書.md#11-git-リポジトリへの登録初回のみ) を参照。
+リポジトリ: [okuson20-dev/testenv](https://github.com/okuson20-dev/testenv)
 
 ## クイックスタート (Windows)
 
