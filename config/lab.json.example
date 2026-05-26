@@ -1,0 +1,79 @@
+{
+  "host": {
+    "gateway": "from_host",
+    "interface": ""
+  },
+  "segments": [
+    {
+      "name": "segment-a",
+      "subnet": "172.30.10.0/24",
+      "gateway": "auto"
+    },
+    {
+      "name": "segment-b",
+      "subnet": "172.30.20.0/24",
+      "gateway": "auto"
+    },
+    {
+      "name": "segment-mgmt",
+      "subnet": "172.30.99.0/24",
+      "gateway": "auto"
+    }
+  ],
+  "router": {
+    "enabled": true,
+    "upstream_gateway": "from_host",
+    "upstream_via": "auto"
+  },
+  "publish_ports": false,
+  "services": {
+    "ntp-primary": {
+      "type": "ntp",
+      "enabled": true,
+      "segment": "segment-mgmt",
+      "ip": "172.30.99.10"
+    },
+    "ntp-secondary": {
+      "type": "ntp",
+      "enabled": true,
+      "segment": "segment-a",
+      "ip": "172.30.10.10"
+    },
+    "dns-primary": {
+      "type": "dns",
+      "enabled": true,
+      "segment": "segment-a",
+      "ip": "172.30.10.53"
+    },
+    "dns-secondary": {
+      "type": "dns",
+      "enabled": true,
+      "segment": "segment-b",
+      "ip": "172.30.20.53"
+    },
+    "dhcp-main": {
+      "type": "dhcp",
+      "enabled": true,
+      "segment": "segment-b",
+      "ip": "172.30.20.2",
+      "options": {
+        "range_start": "172.30.20.100",
+        "range_end": "172.30.20.200",
+        "lease_time": "12h"
+      }
+    },
+    "syslog-main": {
+      "type": "syslog",
+      "enabled": true,
+      "segment": "segment-mgmt",
+      "ip": "172.30.99.14"
+    },
+    "snmp-main": {
+      "type": "snmp",
+      "enabled": true,
+      "segment": "segment-mgmt",
+      "ip": "172.30.99.161",
+      "options": { "community": "public" }
+    }
+  }
+}

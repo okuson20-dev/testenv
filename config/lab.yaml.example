@@ -1,0 +1,97 @@
+# ネットワークラボ設定例
+# コピー: copy config\lab.yaml.example config\lab.yaml  (Windows)
+#         cp config/lab.yaml.example config/lab.yaml    (Linux/macOS)
+
+# 物理NICのデフォルトGWを OS から読み取る（generate / lab up 時に検出）
+# interface を指定すると、その NIC のデフォルトルートのみ対象
+host:
+  gateway: from_host
+  # interface: "Ethernet"
+
+# 各セグメント = Docker の独立ブリッジネットワーク（LAN の別セグメント相当）
+# gateway: auto → サブネットの .1（ラボ内ルータ）。from_host は通常使わない
+segments:
+  - name: segment-a
+    subnet: 172.30.10.0/24
+    gateway: auto
+  - name: segment-b
+    subnet: 172.30.20.0/24
+    gateway: auto
+  - name: segment-mgmt
+    subnet: 172.30.99.0/24
+    gateway: auto
+
+# セグメント間ルーティング（複数セグメントを1台のルータ相当で接続）
+router:
+  enabled: true
+  # 物理NIC側のデフォルトGW（検出値をルータに渡し、外向きは Docker ホスト経由）
+  upstream_gateway: from_host
+  upstream_via: auto
+
+# サービス定義
+# enabled: true/false で ON/OFF
+# ip: 固定IP（セグメントのサブネット内）
+# port: 省略時は各プロトコルのデフォルトポート
+services:
+  ntp-primary:
+    type: ntp
+    enabled: true
+    segment: segment-mgmt
+    ip: 172.30.99.10
+    # port: 123  # 省略時 UDP 123
+
+  ntp-secondary:
+    type: ntp
+    enabled: true
+    segment: segment-a
+    ip: 172.30.10.10
+
+  dns-primary:
+    type: dns
+    enabled: true
+    segment: segment-a
+    ip: 172.30.10.53
+    # port: 53
+
+  dns-secondary:
+    type: dns
+    enabled: true
+    segment: segment-b
+    ip: 172.30.20.53
+
+  dhcp-main:
+    type: dhcp
+    enabled: true
+    segment: segment-b
+    ip: 172.30.20.2
+    options:
+      range_start: 172.30.20.100
+      range_end: 172.30.20.200
+      lease_time: 12h
+      # gateway: auto        # 省略時 = セグメントのラボ内GW（推奨）
+      # gateway: from_host  # DHCP option 3 に物理NICのGWを配布
+
+  syslog-main:
+    type: syslog
+    enabled: true
+    segment: segment-mgmt
+    ip: 172.30.99.14
+    # port: 514  # 省略時 UDP 514
+
+  snmp-main:
+    type: snmp
+    enabled: true
+    segment: segment-mgmt
+    ip: 172.30.99.161
+  #   port: 161  # 省略時 UDP 161
+    options:
+      community: public
+
+# ホスト(Windows PC)から各サービスへポート公開するか
+# true のとき、各サービスに host_port を指定するとホストにバインド（重複不可）
+# 未指定の場合は port（またはデフォルト）をホスト側にも使用
+publish_ports: false
+
+# ホスト公開例（publish_ports: true のとき）:
+#   ntp-primary:
+#     host_port: 1123   # ホスト 1123 -> コンテナ 123
